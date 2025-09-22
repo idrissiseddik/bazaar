@@ -16,9 +16,9 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
 .product-card { cursor: pointer; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); background: #fff; display: flex; flex-direction: column; height: 350px; transition: all 0.3s; position: relative; }
 .product-card:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
 .product-card img { height: 150px; object-fit: cover; width: 100%; }
-.card-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 10px; }
-.card-body h5 { margin-bottom: 4px; font-size: 16px; }
-.card-body p { margin: 0; font-size: 14px; }
+.card-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 5px 10px; }
+.card-body h5 { margin: 0 0 5px 0; font-size: 1rem; }
+.card-body p { margin: 0; font-weight:bold; font-size:0.95rem; }
 .product-badge { position: absolute; top: 5px; right: 5px; background: red; color: white; font-size: 14px; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
 .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; opacity:0; pointer-events:none; transition: opacity 0.3s; z-index:2000; }
 .overlay.show { opacity:1; pointer-events:auto; }
@@ -32,7 +32,7 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
 .btn-add:hover, .btn-close-overlay:hover { transform: scale(1.05); }
 #cartIcon { position: fixed; bottom: 20px; right: 20px; background: #006400; color: white; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; z-index: 1500; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size: 24px; }
 #cartCount { position: absolute; top: 5px; right: 5px; background: red; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; }
-.cart-body { max-height: 300px; overflow-y: auto; margin-bottom: 10px; text-align: left; }
+.cart-body { max-height: 300px; overflow-y: auto; margin: 0; padding: 10px; text-align: left; }
 .cart-header, .cart-footer { text-align:center; font-weight:bold; padding: 10px; background: #f1f1f1; position: sticky; z-index: 10; }
 .cart-header { top: 0; }
 .cart-footer { bottom: 0; }
@@ -57,7 +57,6 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
 <div class="overlay" id="productOverlay">
   <div class="overlay-content">
     <span class="overlay-close" id="overlayClose">&times;</span>
-    <!-- Carousel -->
     <div id="overlayCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
       <div class="carousel-inner" id="carouselImages"></div>
       <button class="carousel-control-prev" type="button" data-bs-target="#overlayCarousel" data-bs-slide="prev">
@@ -69,7 +68,7 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
     </div>
     <h3 id="overlayTitle"></h3>
     <p id="overlayDescription"></p>
-    <p id="overlayPrice" style="font-weight:bold;"></p>
+    <p id="overlayPrice"></p>
     <div class="quantity-container">
       <button id="decreaseQty">-</button>
       <span id="quantity">1</span>
@@ -80,7 +79,6 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
   </div>
 </div>
 
-<!-- Panier flottant -->
 <div id="cartIcon">
   <i class="fa-solid fa-shopping-cart"></i>
   <div id="cartCount">0</div>
@@ -88,7 +86,7 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Produits avec plusieurs images pour le carousel
+// Produits avec plusieurs images
 const products = [
   { id:1, title:"Tapis Marocain", description:"Beau tapis fait à la main.", price:250, images:["images/tapis01.jpg","images/tapis02.jpg"] },
   { id:2, title:"Lampes Artisanales", description:"Lampes traditionnelles en métal.", price:150, images:["images/lampe.jpg","images/lampe2.jpg"] },
@@ -99,6 +97,7 @@ const products = [
 let cart = [];
 const container = document.getElementById("products-container");
 
+// Création des cartes produits
 products.forEach((product)=>{
   const div = document.createElement("div");
   div.classList.add("col-6","col-md-3");
@@ -133,8 +132,7 @@ document.querySelectorAll(".product-card").forEach(card=>{
     overlayTitle.textContent = selectedProduct.title;
     overlayDescription.textContent = selectedProduct.description;
     overlayPrice.textContent = selectedProduct.price + " DH";
-    qty = 1;
-    quantitySpan.textContent = qty;
+    qty = 1; quantitySpan.textContent = qty;
     carouselImages.innerHTML = "";
     selectedProduct.images.forEach((img, i)=>{
       carouselImages.innerHTML += `<div class="carousel-item ${i===0?"active":""}">
@@ -157,7 +155,6 @@ addToCartBtn.addEventListener("click", ()=>{
   const existing = cart.find(p=>p.id===selectedProduct.id);
   if(existing){
     Swal.fire({icon:'warning', title:'Produit déjà dans le panier', text:`${selectedProduct.title} est déjà dans votre panier.`});
-    overlay.classList.remove("show");
     return;
   }
   const newItem = { ...selectedProduct, quantity: qty };
@@ -172,13 +169,13 @@ const cartIcon = document.getElementById("cartIcon");
 cartIcon.addEventListener("click", showCartAlert);
 
 function updateCartCount(){ cartCount.textContent = cart.length; }
-
 function updateProductBadge(id, quantity){
   const badge = document.getElementById("badge-"+id);
   if(quantity>0){ badge.style.display="flex"; badge.textContent=quantity; }
   else { badge.style.display="none"; }
 }
 
+// Modale panier avec header/footer fixes
 function showCartAlert() {
   if(cart.length===0){ Swal.fire('Panier vide','Votre panier est vide.','info'); return; }
 
@@ -231,19 +228,8 @@ function showCartAlert() {
                         `\nTotal: ${cart.reduce((sum,p)=>sum+p.price*p.quantity,0)} DH`;
           const url=`https://wa.me/212608975435?text=${encodeURIComponent(message)}`;
           window.open(url,'_blank');
-          cart=[];
-          updateCartCount();
-          products.forEach(p=>updateProductBadge(p.id,0));
-          setTimeout(()=>{
-            Swal.close();
-            Swal.fire({
-              icon:'success',
-              title:'Commande envoyée !',
-              text:'Votre commande a été transmise avec succès sur WhatsApp.',
-              timer:2500,
-              showConfirmButton:false
-            });
-          }, 1000);
+          cart=[]; updateCartCount(); products.forEach(p=>updateProductBadge(p.id,0));
+          setTimeout(()=>{ Swal.close(); Swal.fire({icon:'success', title:'Commande envoyée !', text:'Votre commande a été transmise sur WhatsApp.', timer:2500, showConfirmButton:false}); }, 1000);
         }
       });
     }
@@ -269,9 +255,7 @@ function showCartAlert() {
     }).then((result)=>{
       if(result.isConfirmed){
         const removed = cart.splice(index,1)[0];
-        updateCartCount();
-        updateProductBadge(removed.id, 0);
-        showCartAlert();
+        updateCartCount(); updateProductBadge(removed.id, 0); showCartAlert();
         Swal.fire({icon:'success', title:'Supprimé!', text:'Le produit a été supprimé du panier.', timer:1200, showConfirmButton:false});
       }
     });
