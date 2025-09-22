@@ -1,406 +1,228 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bazaar Entre Particuliers - Ouverture Prochaine!</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-  <script src="https://kit.fontawesome.com/a2d9a8d2d3.js" crossorigin="anonymous"></script>
-  <style>
-    :root {
-      --primary-color: #198754;
-      --secondary-color: #145c3b;
-      --accent-color: #ffc107;
-      --error-color: #dc3545;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      color: white;
-      overflow: hidden;
-    }
-    
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), 
-                  url('https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
-      background-size: cover;
-      z-index: -1;
-    }
-    
-    .content {
-      max-width: 800px;
-      width: 90%;
-      padding: 2rem;
-      z-index: 1;
-    }
-    
-    .logo {
-      font-size: clamp(2.5rem, 8vw, 4.5rem);
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
-    }
-    
-    .logo i {
-      color: var(--accent-color);
-    }
-    
-    .tagline {
-      font-size: clamp(1.2rem, 4vw, 2rem);
-      margin-bottom: 2rem;
-      font-weight: 300;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
-    }
-    
-    .opening-soon {
-      font-size: clamp(1.8rem, 5vw, 3rem);
-      font-weight: 600;
-      margin: 2rem 0;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
-    }
-    
-    .notify-btn {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      font-size: clamp(1rem, 3vw, 1.3rem);
-      font-weight: 600;
-      border-radius: 50px;
-      transition: all 0.3s;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      cursor: pointer;
-      width: 100%;
-      max-width: 300px;
-      margin: 1rem auto;
-    }
-    
-    .notify-btn:hover {
-      background: var(--secondary-color);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-    
-    .fixed-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background-color: rgba(25, 135, 84, 0.8);
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      z-index: 10;
-    }
-    
-    .fixed-footer a {
-      color: var(--accent-color);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    
-    /* Notification Toast */
-    .notification-toast {
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: var(--error-color);
-      color: white;
-      padding: 15px 25px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      opacity: 0;
-      transition: all 0.3s ease;
-    }
-    
-    .notification-toast.show {
-      top: 20px;
-      opacity: 1;
-    }
-    
-    .notification-icon {
-      font-size: 1.2rem;
-    }
-    
-    /* Modale */
-    .custom-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.8);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .custom-modal.show {
-      display: flex;
-    }
-    
-    .custom-modal-content {
-      background: white;
-      border-radius: 15px;
-      width: 90%;
-      max-width: 500px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      animation: modalFadeIn 0.3s forwards;
-    }
-    
-    @keyframes modalFadeIn {
-      from {
-        transform: translateY(-20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-    
-    .custom-modal-header {
-      background: var(--primary-color);
-      color: white;
-      padding: 1.2rem;
-      position: relative;
-    }
-    
-    .custom-modal-title {
-      margin: 0;
-      font-size: 1.3rem;
-      font-weight: 600;
-    }
-    
-    .custom-modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    
-    .custom-modal-body {
-      padding: 1.5rem;
-    }
-    
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-    
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--secondary-color);
-      font-size: 0.9rem;
-    }
-    
-    .form-control {
-      width: 100%;
-      padding: 0.7rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-    
-    .custom-modal-footer {
-      padding: 1.2rem;
-      background: #f8f9fa;
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-    }
-    
-    .modal-btn {
-      padding: 0.7rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-    
-    .btn-primary {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-    }
-    
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #ddd;
-      color: #555;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazar Marocain</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+body { padding-top: 140px; padding-bottom: 80px; background: #f7f7f7; font-family: "Segoe UI", sans-serif; }
+header, footer { position: fixed; width: 100%; left: 0; z-index: 1000; text-align: center; color: white; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+header { top: 0; padding: 20px 0; background: linear-gradient(90deg, #006400, #ff0000); font-size: 28px; }
+footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000, #006400); font-size: 18px; }
+.marquee-container { background: #ffd700; color: #006400; padding: 8px 0; position: fixed; top: 80px; width: 100%; z-index: 1001; font-weight: bold; }
+.product-card { cursor: pointer; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); background: #fff; opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+.product-card.show { opacity: 1; transform: translateY(0); }
+.product-card:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+.overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; opacity:0; pointer-events:none; transition: opacity 0.3s; z-index:2000; }
+.overlay.show { opacity:1; pointer-events:auto; }
+.overlay-content { background:#fff; padding:25px; border-radius:15px; max-width:500px; width:90%; position: relative; animation: fadeIn 0.4s; text-align:center; }
+@keyframes fadeIn { from {opacity:0; transform: translateY(-20px);} to {opacity:1; transform: translateY(0);} }
+.overlay img { width:100%; border-radius:10px; margin-bottom:15px; }
+.overlay-close { position:absolute; top:10px; right:15px; cursor:pointer; color:red; font-size:28px; }
+.quantity-container { display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:15px; }
+.quantity-container button { width:35px; height:35px; border:none; background:#006400; color:white; font-size:18px; border-radius:5px; cursor:pointer; }
+.quantity-container span { min-width:30px; display:inline-block; text-align:center; font-weight:bold; font-size:18px; }
+.btn-add { transition: all 0.3s; }
+.btn-add:hover { transform: scale(1.05); }
+#cartIcon { position: fixed; bottom: 20px; right: 20px; background: #006400; color: white; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; z-index: 1500; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size: 24px; }
+#cartCount { position: absolute; top: 5px; right: 5px; background: red; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; }
+</style>
 </head>
 <body>
-  <div class="content animate__animated animate__fadeIn">
-    <div class="logo">
-      <i class="fas fa-store"></i> Bazaar Entre Particuliers
-    </div>
-    
-    <div class="tagline">
-      Votre marché local en ligne arrive bientôt!
-    </div>
-    
-    <div class="opening-soon animate__animated animate__pulse animate__infinite">
-      Ouverture Prochaine
-    </div>
-    
-    <button class="notify-btn" id="notifyButton">
-      <i class="fas fa-bell"></i> Notifiez-moi
-    </button>
-  </div>
-  
-  <footer class="fixed-footer">
-    Géré Par : <a href="https://wa.me/212608975435">M.Seddik Elidrissi</a> | WhatsApp: +212 608-975435
-  </footer>
-  
-  <!-- Modale -->
-  <div class="custom-modal" id="notificationModal">
-    <div class="custom-modal-content">
-      <div class="custom-modal-header">
-        <h3 class="custom-modal-title">Notification d'ouverture</h3>
-        <button class="custom-modal-close" id="closeModal">&times;</button>
-      </div>
-      <div class="custom-modal-body">
-        <form id="notificationForm">
-          <div class="form-group">
-            <label for="userName" class="form-label">Nom complet*</label>
-            <input type="text" id="userName" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="userPhone" class="form-label">Téléphone*</label>
-            <input type="tel" id="userPhone" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="userEmail" class="form-label">Email (facultatif)</label>
-            <input type="email" id="userEmail" class="form-control">
-          </div>
-        </form>
-      </div>
-      <div class="custom-modal-footer">
-        <button class="modal-btn btn-outline" id="cancelButton">Annuler</button>
-        <button class="modal-btn btn-primary" id="submitButton">Envoyer</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Notification Toast -->
-  <div class="notification-toast" id="notificationToast">
-    <i class="fas fa-exclamation-circle notification-icon"></i>
-    <span id="toastMessage"></span>
+<header>Bazar Marocain</header>
+<div class="marquee-container">
+  <marquee behavior="scroll" direction="left">🌟 Promotions du jour: Tapis -10%, Lampes -15%, Épices -5% 🌟</marquee>
+</div>
+
+<div class="container my-4">
+  <div class="row g-3" id="products-container"></div>
+</div>
+
+<footer>&copy; 2025 Bazar Marocain</footer>
+
+<!-- Overlay Produit -->
+<div class="overlay" id="productOverlay">
+  <div class="overlay-content">
+    <span class="overlay-close" id="overlayClose">&times;</span>
+    <img id="overlayImage" src="" alt="Produit">
+    <h3 id="overlayTitle"></h3>
+    <p id="overlayDescription"></p>
+    <p id="overlayPrice" style="font-weight:bold;"></p>
+    <div class="quantity-container">
+      <button id="decreaseQty">-</button>
+      <span id="quantity">1</span>
+      <button id="increaseQty">+</button>
+    </div>
+    <button class="btn btn-success w-100 btn-add" id="addToCartBtn"><i class="fa-solid fa-cart-plus"></i> Ajouter au panier</button>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Gestion de la modale
-      const modal = document.getElementById('notificationModal');
-      const openButton = document.getElementById('notifyButton');
-      const closeButton = document.getElementById('closeModal');
-      const cancelButton = document.getElementById('cancelButton');
-      const submitButton = document.getElementById('submitButton');
-      const toast = document.getElementById('notificationToast');
-      const toastMessage = document.getElementById('toastMessage');
-      
-      // Fonction pour afficher les notifications
-      function showNotification(message) {
-        toastMessage.textContent = message;
-        toast.classList.add('show');
-        
-        // Disparaît automatiquement après 3 secondes
-        setTimeout(() => {
-          toast.classList.remove('show');
-        }, 3000);
-      }
+<!-- Panier flottant -->
+<div id="cartIcon">
+  <i class="fa-solid fa-shopping-cart"></i>
+  <div id="cartCount">0</div>
+</div>
 
-      // Ouvrir la modale
-      openButton.addEventListener('click', function() {
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
-      });
-      
-      // Fermer la modale
-      function closeModal() {
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
-      }
-      
-      closeButton.addEventListener('click', closeModal);
-      cancelButton.addEventListener('click', closeModal);
-      
-      // Fermer en cliquant à l'extérieur
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-          closeModal();
-        }
-      });
-      
-      // Envoyer le formulaire
-      submitButton.addEventListener('click', function() {
-        const name = document.getElementById('userName').value.trim();
-        const phone = document.getElementById('userPhone').value.trim();
-        const email = document.getElementById('userEmail').value.trim();
-        
-        if (!name || !phone) {
-          showNotification('Veuillez remplir les champs obligatoires (Nom et Téléphone)');
-          return;
-        }
-        
-        // Formater le message WhatsApp
-        const whatsappMessage = `Nouvelle pré-inscription Bazaar:%0A%0A` +
-                               `*Nom:* ${name}%0A` +
-                               `*Téléphone:* ${phone}%0A` +
-                               (email ? `*Email:* ${email}` : '');
-        
-        // Numéro WhatsApp
-        const whatsappNumber = '212608975435';
-        
-        // Ouvrir WhatsApp
-        window.open(`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`, '_blank');
-        
-        // Réinitialiser le formulaire
-        document.getElementById('notificationForm').reset();
-        
-        // Fermer la modale
-        closeModal();
-        
-        // Message de confirmation
-        showNotification(`Merci ${name} ! Nous vous contacterons bientôt.`);
-      });
+<script>
+const products = [
+  { id:1, title:"Tapis Marocain", description:"Beau tapis fait à la main.", price:250, image:"https://via.placeholder.com/300x200?text=Tapis" },
+  { id:2, title:"Lampes Artisanales", description:"Lampes traditionnelles en métal.", price:150, image:"https://via.placeholder.com/300x200?text=Lampes" },
+  { id:3, title:"Céramiques", description:"Vaisselle et poteries marocaines.", price:80, image:"https://via.placeholder.com/300x200?text=Ceramiques" },
+  { id:4, title:"Épices", description:"Mélange d'épices marocaines.", price:50, image:"https://via.placeholder.com/300x200?text=Epices" },
+];
+
+let cart = [];
+const container = document.getElementById("products-container");
+
+products.forEach((product,i)=>{
+  const div = document.createElement("div");
+  div.classList.add("col-6","col-md-3");
+  div.innerHTML = `
+    <div class="card product-card" data-id="${product.id}">
+      <img src="${product.image}" class="card-img-top" alt="${product.title}">
+      <div class="card-body text-center">
+        <h5 class="card-title">${product.title}</h5>
+        <p class="card-text">${product.price} DH</p>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  setTimeout(()=>{div.querySelector(".product-card").classList.add("show");}, i*150);
+});
+
+// Overlay
+const overlay = document.getElementById("productOverlay");
+const overlayImage = document.getElementById("overlayImage");
+const overlayTitle = document.getElementById("overlayTitle");
+const overlayDescription = document.getElementById("overlayDescription");
+const overlayPrice = document.getElementById("overlayPrice");
+const overlayClose = document.getElementById("overlayClose");
+const quantitySpan = document.getElementById("quantity");
+let selectedProduct = null;
+let qty = 1;
+
+document.querySelectorAll(".product-card").forEach(card=>{
+  card.addEventListener("click", ()=>{
+    selectedProduct = products.find(p=>p.id==card.dataset.id);
+    overlayImage.src = selectedProduct.image;
+    overlayTitle.textContent = selectedProduct.title;
+    overlayDescription.textContent = selectedProduct.description;
+    overlayPrice.textContent = selectedProduct.price + " DH";
+    qty = 1;
+    quantitySpan.textContent = qty;
+    overlay.classList.add("show");
+  });
+});
+overlayClose.addEventListener("click", ()=> overlay.classList.remove("show"));
+document.getElementById("increaseQty").addEventListener("click", ()=> { qty++; quantitySpan.textContent = qty; });
+document.getElementById("decreaseQty").addEventListener("click", ()=> { if(qty>1){ qty--; quantitySpan.textContent = qty; }});
+
+const cartCount = document.getElementById("cartCount");
+const addToCartBtn = document.getElementById("addToCartBtn");
+addToCartBtn.addEventListener("click", ()=>{
+  const existing = cart.find(p=>p.id===selectedProduct.id);
+  if(existing){ existing.quantity += qty; } 
+  else { cart.push({ ...selectedProduct, quantity: qty }); }
+  updateCartCount();
+  Swal.fire({icon:'success', title:'Ajouté!', text:`${selectedProduct.title} (${qty}) ajouté au panier.`});
+  overlay.classList.remove("show");
+});
+
+const cartIcon = document.getElementById("cartIcon");
+cartIcon.addEventListener("click", showCartAlert);
+
+function updateCartCount(){
+  cartCount.textContent = cart.reduce((sum,item)=>sum+item.quantity,0);
+}
+
+function showCartAlert() {
+  if(cart.length===0){ Swal.fire('Panier vide','Votre panier est vide.','info'); return; }
+
+  function buildCartHtml(){
+    let html='<ul style="list-style:none;padding:0;">';
+    cart.forEach((item,index)=>{
+      html+=`<li style="margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px;">
+        <strong>${item.title}</strong><br>
+        Prix: ${item.price} DH | Quantité: 
+        <button onclick="changeQty(${index},-1)" style="width:25px;height:25px;background:#006400;color:#fff;border:none;">-</button>
+        ${item.quantity}
+        <button onclick="changeQty(${index},1)" style="width:25px;height:25px;background:#006400;color:#fff;border:none;">+</button>
+        | Total: <span id="itemTotal${index}">${item.price*item.quantity}</span> DH
+        <br><button class="swal2-confirm swal2-styled" style="margin-top:5px;background:#dc3545;" onclick="removeFromCart(${index})">Supprimer</button>
+      </li>`;
     });
-  </script>
+    html+='</ul>';
+    html+=`<strong>Total général: <span id="cartTotal">${cart.reduce((sum,item)=>sum+item.price*item.quantity,0)}</span> DH</strong>`;
+    return html;
+  }
+
+  window.changeQty = function(index,delta){
+    cart[index].quantity += delta;
+    if(cart[index].quantity<1) cart[index].quantity=1;
+    document.getElementById(`itemTotal${index}`).textContent = cart[index].price*cart[index].quantity;
+    document.getElementById('cartTotal').textContent = cart.reduce((sum,item)=>sum+item.price*item.quantity,0);
+    updateCartCount(); // <- correction
+    showCartAlert(); // rafraîchit l'alerte avec nouvelles quantités
+  }
+
+  window.removeFromCart = function(index){
+    cart.splice(index,1);
+    updateCartCount();
+    showCartAlert();
+  }
+
+  Swal.fire({
+    title:'Votre Panier',
+    html: buildCartHtml(),
+    icon:'info',
+    showCancelButton:true,
+    confirmButtonText:'Commander',
+    cancelButtonText:'Fermer',
+    allowOutsideClick:false
+  }).then((result)=>{
+    if(result.isConfirmed){
+      Swal.fire({
+        title:'Vos informations',
+        html:
+          `<label style="color:#000;font-weight:bold;text-align:left;width:100%;">Nom complet</label>`+
+          `<input type="text" id="clientName" class="swal2-input" placeholder="Ex: Ahmed" style="color:#000;background:#fff;border:1px solid #006400;">`+
+          `<label style="color:#000;font-weight:bold;text-align:left;width:100%;">Adresse</label>`+
+          `<input type="text" id="clientAddress" class="swal2-input" placeholder="Ex: Marrakech" style="color:#000;background:#fff;border:1px solid #006400;">`+
+          `<label style="color:#000;font-weight:bold;text-align:left;width:100%;">Commentaire (facultatif)</label>`+
+          `<textarea id="clientComment" class="swal2-textarea" placeholder="Ex: Livrer après 18h" style="color:#000;background:#fff;border:1px solid #006400;"></textarea>`,
+        focusConfirm:false,
+        showCancelButton:true,
+        preConfirm: ()=>{
+            const name=document.getElementById("clientName").value.trim();
+            const address=document.getElementById("clientAddress").value.trim();
+            const comment=document.getElementById("clientComment").value.trim();
+            if(!name||!address){ Swal.showValidationMessage('Veuillez remplir nom et adresse'); return false; }
+            return {name,address,comment};
+        }
+      }).then(info=>{
+        if(info.isConfirmed){
+          const client=info.value;
+          let total=cart.reduce((sum,item)=>sum+item.price*item.quantity,0);
+          let whatsappMsg=`Bonjour,%0AJe souhaite commander:%0A`;
+          cart.forEach(item=>{
+            whatsappMsg+=`- ${item.title} | Prix: ${item.price} DH | Quantité: ${item.quantity} | Total: ${item.price*item.quantity} DH%0A`;
+          });
+          whatsappMsg+=`%0ATotal général: ${total} DH`;
+          whatsappMsg+=`%0A%0ANom: ${client.name}%0AAdresse: ${client.address}`;
+          if(client.comment) whatsappMsg+=`%0ACommentaire: ${client.comment}`;
+          window.open(`https://wa.me/212608975435?text=${whatsappMsg}`,'_blank');
+          Swal.fire('Merci!','Votre commande a été envoyée via WhatsApp.','success');
+          cart=[];
+          updateCartCount();
+        }
+      });
+    }
+  });
+}
+</script>
 </body>
 </html>
