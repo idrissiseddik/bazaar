@@ -13,29 +13,14 @@ header, footer { position: fixed; width: 100%; left: 0; z-index: 1000; text-alig
 header { top: 0; padding: 20px 0; background: linear-gradient(90deg, #006400, #ff0000); font-size: 28px; }
 footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000, #006400); font-size: 18px; }
 .marquee-container { background: #ffd700; color: #006400; padding: 8px 0; position: fixed; top: 80px; width: 100%; z-index: 1001; font-weight: bold; }
-.product-card { 
-  cursor: pointer; 
-  border-radius: 10px; 
-  overflow: hidden; 
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-  background: #fff; 
-  opacity: 0; 
-  transform: translateY(20px); 
-  transition: all 0.5s ease; 
-  display: flex; 
-  flex-direction: column; 
-  height: 350px; 
-}
-.product-card.show { opacity: 1; transform: translateY(0); }
+.product-card { cursor: pointer; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); background: #fff; display: flex; flex-direction: column; height: 350px; transition: all 0.3s; }
 .product-card:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
 .product-card img { height: 150px; object-fit: cover; width: 100%; }
 .card-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .card-body p { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-
 .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; opacity:0; pointer-events:none; transition: opacity 0.3s; z-index:2000; }
 .overlay.show { opacity:1; pointer-events:auto; }
-.overlay-content { background:#fff; padding:25px; border-radius:15px; max-width:500px; width:90%; position: relative; animation: fadeIn 0.4s; text-align:center; }
-@keyframes fadeIn { from {opacity:0; transform: translateY(-20px);} to {opacity:1; transform: translateY(0);} }
+.overlay-content { background:#fff; padding:25px; border-radius:15px; max-width:500px; width:90%; position: relative; text-align:center; }
 .overlay img { width:100%; border-radius:10px; margin-bottom:15px; }
 .overlay-close { position:absolute; top:10px; right:15px; cursor:pointer; color:red; font-size:28px; }
 .quantity-container { display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:15px; }
@@ -45,6 +30,8 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
 .btn-add:hover { transform: scale(1.05); }
 #cartIcon { position: fixed; bottom: 20px; right: 20px; background: #006400; color: white; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; z-index: 1500; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size: 24px; }
 #cartCount { position: absolute; top: 5px; right: 5px; background: red; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; }
+.cart-body { max-height: 300px; overflow-y: auto; margin-bottom: 10px; }
+.cart-header, .cart-footer { text-align:center; font-weight:bold; margin-bottom:5px; }
 </style>
 </head>
 <body>
@@ -110,7 +97,7 @@ products.forEach((product,i)=>{
   setTimeout(()=>{div.querySelector(".product-card").classList.add("show");}, i*150);
 });
 
-// Overlay
+// Overlay produit
 const overlay = document.getElementById("productOverlay");
 const overlayImage = document.getElementById("overlayImage");
 const overlayTitle = document.getElementById("overlayTitle");
@@ -142,11 +129,7 @@ const addToCartBtn = document.getElementById("addToCartBtn");
 addToCartBtn.addEventListener("click", ()=>{
   const existing = cart.find(p=>p.id===selectedProduct.id);
   if(existing){
-    Swal.fire({
-      icon:'warning',
-      title:'Produit déjà dans le panier',
-      text:`${selectedProduct.title} est déjà dans votre panier.`,
-    });
+    Swal.fire({icon:'warning', title:'Produit déjà dans le panier', text:`${selectedProduct.title} est déjà dans votre panier.`});
     overlay.classList.remove("show");
     return;
   }
@@ -159,93 +142,69 @@ addToCartBtn.addEventListener("click", ()=>{
 const cartIcon = document.getElementById("cartIcon");
 cartIcon.addEventListener("click", showCartAlert);
 
-function updateCartCount(){
-  cartCount.textContent = cart.reduce((sum,item)=>sum+item.quantity,0);
-}
+function updateCartCount(){ cartCount.textContent = cart.length; }
 
 function showCartAlert() {
   if(cart.length===0){ Swal.fire('Panier vide','Votre panier est vide.','info'); return; }
 
   function buildCartHtml(){
-    let html='<ul style="list-style:none;padding:0;">';
+    let html='<div class="cart-header">Votre Panier</div>';
+    html+='<div class="cart-body"><ul style="list-style:none;padding:0;">';
     cart.forEach((item,index)=>{
       html+=`<li style="margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px;">
         <strong>${item.title}</strong><br>
         Prix: ${item.price} DH | Quantité: 
         <button onclick="changeQty(${index},-1)" style="width:25px;height:25px;background:#006400;color:#fff;border:none;">-</button>
-        ${item.quantity}
+        <span id="itemQty${index}">${item.quantity}</span>
         <button onclick="changeQty(${index},1)" style="width:25px;height:25px;background:#006400;color:#fff;border:none;">+</button>
         | Total: <span id="itemTotal${index}">${item.price*item.quantity}</span> DH
         <br><button class="swal2-confirm swal2-styled" style="margin-top:5px;background:#dc3545;" onclick="removeFromCart(${index})">Supprimer</button>
       </li>`;
     });
-    html+='</ul>';
-    html+=`<strong>Total général: <span id="cartTotal">${cart.reduce((sum,item)=>sum+item.price*item.quantity,0)}</span> DH</strong>`;
+    html+='</ul></div>';
+    html+='<div class="cart-footer"><strong>Total général: <span id="cartTotal">'+cart.reduce((sum,item)=>sum+item.price*item.quantity,0)+'</span> DH</strong></div>';
     return html;
   }
 
-  window.changeQty = function(index,delta){
-    cart[index].quantity += delta;
-    if(cart[index].quantity<1) cart[index].quantity=1;
-    document.getElementById(`itemTotal${index}`).textContent = cart[index].price*cart[index].quantity;
-    document.getElementById('cartTotal').textContent = cart.reduce((sum,item)=>sum+item.price*item.quantity,0);
-    updateCartCount(); 
-    showCartAlert(); 
-  }
-
-  window.removeFromCart = function(index){
-    cart.splice(index,1);
-    updateCartCount();
-    showCartAlert();
-  }
-
   Swal.fire({
-    title:'Votre Panier',
     html: buildCartHtml(),
-    icon:'info',
     showCancelButton:true,
     confirmButtonText:'Commander',
     cancelButtonText:'Fermer',
+    width:500,
     allowOutsideClick:false
-  }).then((result)=>{
-    if(result.isConfirmed){
-      Swal.fire({
-        title:'Vos informations',
-        html:
-          `<label style="color:#000;font-weight:bold;text-align:left;width:100%;">Nom complet</label>`+
-          `<input type="text" id="clientName" class="swal2-input" placeholder="Ex: Ahmed" style="color:#000;background:#fff;border:1px solid #006400;">`+
-          `<label style="color:#000;font-weight:bold;text-align:left;width:100%;">Adresse</label>`+
-          `<input type="text" id="clientAddress" class="swal2-input" placeholder="Ex: Marrakech" style="color:#000;background:#fff;border:1px solid #006400;">`+
-          `<label style="color:#000;font-weight:bold;text-align:left;width:100%;">Commentaire (facultatif)</label>`+
-          `<textarea id="clientComment" class="swal2-textarea" placeholder="Ex: Livrer après 18h" style="color:#000;background:#fff;border:1px solid #006400;"></textarea>`,
-        focusConfirm:false,
-        showCancelButton:true,
-        preConfirm: ()=>{
-            const name=document.getElementById("clientName").value.trim();
-            const address=document.getElementById("clientAddress").value.trim();
-            const comment=document.getElementById("clientComment").value.trim();
-            if(!name||!address){ Swal.showValidationMessage('Veuillez remplir nom et adresse'); return false; }
-            return {name,address,comment};
-        }
-      }).then(info=>{
-        if(info.isConfirmed){
-          const client=info.value;
-          let total=cart.reduce((sum,item)=>sum+item.price*item.quantity,0);
-          let whatsappMsg=`Bonjour,%0AJe souhaite commander:%0A`;
-          cart.forEach(item=>{
-            whatsappMsg+=`- ${item.title} | Prix: ${item.price} DH | Quantité: ${item.quantity} | Total: ${item.price*item.quantity} DH%0A`;
-          });
-          whatsappMsg+=`%0ATotal général: ${total} DH`;
-          whatsappMsg+=`%0A%0ANom: ${client.name}%0AAdresse: ${client.address}`;
-          if(client.comment) whatsappMsg+=`%0ACommentaire: ${client.comment}`;
-          window.open(`https://wa.me/212608975435?text=${whatsappMsg}`,'_blank');
-          Swal.fire('Merci!','Votre commande a été envoyée via WhatsApp.','success');
-          cart=[];
-          updateCartCount();
-        }
-      });
-    }
   });
+
+  // Modification quantité sans fermer la modale
+  window.changeQty = function(index, delta){
+    cart[index].quantity += delta;
+    if(cart[index].quantity < 1) cart[index].quantity = 1;
+    document.getElementById(`itemQty${index}`).textContent = cart[index].quantity;
+    document.getElementById(`itemTotal${index}`).textContent = cart[index].price * cart[index].quantity;
+    document.getElementById('cartTotal').textContent = cart.reduce((sum,item)=>sum+item.price*item.quantity,0);
+    updateCartCount();
+  }
+
+  // Supprimer sans fermer la modale
+  window.removeFromCart = function(index){
+    Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: `Voulez-vous supprimer ${cart[index].title} du panier ?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, supprimer',
+      cancelButtonText: 'Annuler'
+    }).then((result)=>{
+      if(result.isConfirmed){
+        cart.splice(index,1);
+        updateCartCount();
+        const li = document.querySelectorAll('.cart-body ul li')[index];
+        if(li) li.parentNode.removeChild(li);
+        document.getElementById('cartTotal').textContent = cart.reduce((sum,item)=>sum+item.price*item.quantity,0);
+        Swal.fire('Supprimé!','Le produit a été supprimé du panier.','success');
+      }
+    });
+  }
 }
 </script>
 </body>
