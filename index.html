@@ -32,6 +32,15 @@ footer { bottom: 0; padding: 15px 0; background: linear-gradient(90deg, #ff0000,
 #cartCount { position: absolute; top: 5px; right: 5px; background: red; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; }
 .cart-body { max-height: 300px; overflow-y: auto; margin-bottom: 10px; }
 .cart-header, .cart-footer { text-align:center; font-weight:bold; margin-bottom:5px; }
+/* Styles pour les labels et placeholders en noir */
+.swal2-input, .swal2-textarea {
+    color: #000 !important;
+    background-color: #fff !important;
+    border: 1px solid #ccc;
+}
+.swal2-input::placeholder, .swal2-textarea::placeholder {
+    color: #000 !important;
+}
 </style>
 </head>
 <body>
@@ -81,7 +90,7 @@ const products = [
 let cart = [];
 const container = document.getElementById("products-container");
 
-products.forEach((product,i)=>{
+products.forEach((product)=>{
   const div = document.createElement("div");
   div.classList.add("col-6","col-md-3");
   div.innerHTML = `
@@ -94,7 +103,6 @@ products.forEach((product,i)=>{
     </div>
   `;
   container.appendChild(div);
-  setTimeout(()=>{div.querySelector(".product-card").classList.add("show");}, i*150);
 });
 
 // Overlay produit
@@ -173,9 +181,42 @@ function showCartAlert() {
     cancelButtonText:'Fermer',
     width:500,
     allowOutsideClick:false
+  }).then((result)=>{
+    if(result.isConfirmed){
+      Swal.fire({
+        title: 'Vos informations',
+        html:
+          `<input id="clientName" class="swal2-input" placeholder="Nom">
+           <input id="clientAddress" class="swal2-input" placeholder="Adresse">
+           <textarea id="clientComment" class="swal2-textarea" placeholder="Commentaire (facultatif)"></textarea>`,
+        focusConfirm: false,
+        confirmButtonText: 'Envoyer la commande',
+        preConfirm: () => {
+          const name = document.getElementById('clientName').value.trim();
+          const address = document.getElementById('clientAddress').value.trim();
+          const comment = document.getElementById('clientComment').value.trim();
+          if(!name || !address){
+            Swal.showValidationMessage('⚠️ Veuillez remplir le nom et l\'adresse');
+            return false;
+          }
+          return { name, address, comment };
+        }
+      }).then((client)=>{
+        if(client.value){
+          let msg = "Commande Bazar Marocain :%0A";
+          cart.forEach(item=>{
+            msg += `- ${item.title} x${item.quantity} : ${item.price*item.quantity} DH%0A`;
+          });
+          msg += `Total: ${cart.reduce((sum,item)=>sum+item.price*item.quantity,0)} DH%0A`;
+          msg += `Nom: ${client.value.name}%0AAdresse: ${client.value.address}%0ACommentaire: ${client.value.comment||"-"}`;
+          window.open(`https://wa.me/212608975435?text=${msg}`,'_blank');
+          Swal.fire('Merci!','Votre commande a été envoyée via WhatsApp','success');
+          cart = []; updateCartCount();
+        }
+      });
+    }
   });
 
-  // Modification quantité sans fermer la modale
   window.changeQty = function(index, delta){
     cart[index].quantity += delta;
     if(cart[index].quantity < 1) cart[index].quantity = 1;
@@ -185,7 +226,6 @@ function showCartAlert() {
     updateCartCount();
   }
 
-  // Supprimer sans fermer la modale
   window.removeFromCart = function(index){
     Swal.fire({
       title: 'Êtes-vous sûr ?',
@@ -201,7 +241,7 @@ function showCartAlert() {
         const li = document.querySelectorAll('.cart-body ul li')[index];
         if(li) li.parentNode.removeChild(li);
         document.getElementById('cartTotal').textContent = cart.reduce((sum,item)=>sum+item.price*item.quantity,0);
-        Swal.fire('Supprimé!','Le produit a été supprimé du panier.','success');
+        Swal.fire({icon:'success', title:'Supprimé!', text:'Le produit a été supprimé du panier.', timer:1200, showConfirmButton:false});
       }
     });
   }
